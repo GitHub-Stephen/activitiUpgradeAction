@@ -1,4 +1,4 @@
-name: Build Native Image (CentOS 7 in Docker)
+name: Build & Verify Native Image
 
 on:
   push:
@@ -6,46 +6,44 @@ on:
 
 jobs:
   build:
-    name: Build Native Image in CentOS 7
+    name: Build Native Image
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      - name: Checkout source
         uses: actions/checkout@v4
 
       - name: Prepare build context
         run: |
-          mkdir build-context
+          mkdir -p build-context/classes
           cp -r src jar build-context/
           cp -r src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/
 
-      - name: Build Native Image in CentOS 7 Docker
+      - name: Compile classes
         run: |
-          docker run --rm -v ${{ github.workspace }}/build-context:/app -w /app centos:7 bash -c "
-            # 替换 YUM 源为阿里云
-            sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-                -e 's|^#baseurl=http://mirror.centos.org|baseurl=https://mirrors.aliyun.com|g' \
-                -i.bak \
-                /etc/yum.repos.d/CentOS-Base.repo &&
-            yum clean all &&
-            yum makecache &&
-            yum install -y gcc glibc-devel zlib-devel wget unzip curl tar &&
+          javac -d build-context/classes -cp "jar/*" \
+            src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
 
-            curl -L -o graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-24.0.1/graalvm-community-jdk-24.0.1_linux-x64_bin.tar.gz &&
-            tar -xzf graalvm.tar.gz &&
-            export GRAALVM_HOME=$(pwd)/graalvm-community-openjdk-24.0.1+9.1 &&
-            export PATH=\$GRAALVM_HOME/bin:\$PATH &&
-          
-            # 验证 Java 与 native-image
-            native-image --version &&
+      - name: Build native image via GraalVM container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/build-context:/app:Z \
+            -w /app \
+            ghcr.io/graalvm/native-image-community:21 \
+            native-image \
+              -cp classes:jar/* \
+              com.redxun.util.CompatibilityProcessRepairTool \
+              compatibility-tool
 
-            mkdir -p classes &&
-            javac -d classes -cp \"jar/*\" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
+      - name: Verify on CentOS 7
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/build-context:/app:Z \
+            -w /app \
+            centos:7 \
+            bash -c "./compatibility-tool --version && echo '✅ runs on CentOS 7!'"
 
-            native-image -cp classes:jar/* com.redxun.util.CompatibilityProcessRepairTool compatibility-tool
-          "
-
-      - name: Archive binary
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: compatibility-tool-centos7
