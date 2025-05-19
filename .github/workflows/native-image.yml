@@ -29,9 +29,7 @@ jobs:
             -u root \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
-              pwd && \         
-              ls -l   
-              
+              pwd
             "
 
       - name: Verify on CentOS 7
