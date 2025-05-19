@@ -22,7 +22,6 @@ jobs:
           version: '21.0.2'
           java-version: '21'
           distribution: 'graalvm-community'
-          components: native-image
 
       - name: Compile Java Class
         run: |
