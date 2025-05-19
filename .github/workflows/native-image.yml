@@ -26,12 +26,12 @@ jobs:
       - name: Compile Java Class
         run: |
           mkdir -p classes
-          javac -d classes -cp "lib/*" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
+          javac -d classes -cp "jar/*" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
 
       - name: Build Native Image
         run: |
           native-image \
-            -cp classes:lib/* \
+            -cp classes:jar/* \
             com.redxun.util.CompatibilityProcessRepairTool \
             compatibility-tool
 
