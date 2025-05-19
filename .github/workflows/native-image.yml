@@ -29,6 +29,7 @@ jobs:
             -u root \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
+              cd /app/backend && \
               pwd
             "
 
