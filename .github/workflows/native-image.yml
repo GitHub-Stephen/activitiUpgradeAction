@@ -41,7 +41,7 @@ jobs:
             --allow-incomplete-classpath
 
       - name: Archive binary
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v4
         with:
           name: compatibility-tool-${{ matrix.os }}
           path: compatibility-tool*
