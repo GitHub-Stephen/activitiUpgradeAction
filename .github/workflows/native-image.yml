@@ -24,14 +24,17 @@ jobs:
       - name: Compile and build native image
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}/build-context:/app \
+            -v ${{ github.workspace }}/build-context/src:/src \
+            -v ${{ github.workspace }}/build-context/jar:/jar \
+            -v ${{ github.workspace }}/build-context/output:/output \
             -w /app \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p /app/classes &&
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
-              /opt/graalvm/bin/native-image \
-                -cp /app/classes:/app/jar/* \
+              native-image \
+                -cp /classes:/jar/* \
+                -H:Path=/output \
                 com.redxun.util.CompatibilityProcessRepairTool \
                 compatibility-tool
             "
