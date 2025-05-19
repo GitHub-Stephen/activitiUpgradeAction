@@ -1,0 +1,47 @@
+name: Build Native Image (Multi-platform)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  build-native:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          version: '21.0.2'
+          java-version: '21'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Java class
+        run: |
+          mkdir -p classes
+          javac -cp "jar/*" -d classes src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
+
+      - name: Build native image
+        run: |
+          native-image \
+            -cp "classes:jar/*" \
+            -H:Name=compatibility-tool \
+            -H:Class=com.redxun.util.CompatibilityProcessRepairTool \
+            --no-fallback \
+            --enable-all-security-services \
+            --report-unsupported-elements-at-runtime \
+            --allow-incomplete-classpath
+
+      - name: Archive binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: compatibility-tool-${{ matrix.os }}
+          path: compatibility-tool*
