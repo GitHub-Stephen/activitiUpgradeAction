@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build Native Image
+    name: Build Native Image with JDK 21 (GraalVM)
     runs-on: ubuntu-latest
 
     steps:
@@ -15,33 +15,32 @@ jobs:
 
       - name: Prepare build context
         run: |
-          mkdir -p build-context/classes
-          cp -r src jar build-context/
-          cp -r src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/
+          mkdir -p build-context/src
+          cp -r src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/src/
+          cp -r jar build-context/
 
-      - name: Compile classes
-        run: |
-          javac -d build-context/classes -cp "jar/*" \
-            src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
-
-      - name: Build native image via GraalVM container
+      - name: Compile and build native image using GraalVM JDK 21
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}/build-context:/app:Z \
+            -v ${{ github.workspace }}/build-context:/app \
             -w /app \
             ghcr.io/graalvm/native-image-community:21 \
-            native-image \
-              -cp classes:jar/* \
-              com.redxun.util.CompatibilityProcessRepairTool \
-              compatibility-tool
+            bash -c "
+              mkdir -p classes &&
+              javac -d classes -cp 'jar/*' src/CompatibilityProcessRepairTool.java &&
+              native-image \
+                -cp classes:jar/* \
+                com.redxun.util.CompatibilityProcessRepairTool \
+                compatibility-tool
+            "
 
       - name: Verify on CentOS 7
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}/build-context:/app:Z \
+            -v ${{ github.workspace }}/build-context:/app \
             -w /app \
             centos:7 \
-            bash -c "./compatibility-tool --version && echo '✅ runs on CentOS 7!'"
+            bash -c "./compatibility-tool --version && echo '✅ Runs on CentOS 7 successfully'"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
