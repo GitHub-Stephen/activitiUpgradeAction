@@ -33,12 +33,8 @@ jobs:
               ls -l && \
               chmod 777 /app/output && \
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
-              ls -l /app/output && \
-              # native-image \
-              #   -cp /app/classes:/app/jar/* \
-              #   -H:Path=/app/output \
-              #   com.redxun.util.CompatibilityProcessRepairTool \
-              #   compatibility-tool
+              ls -l /app/output
+              
             "
 
       - name: Verify on CentOS 7
