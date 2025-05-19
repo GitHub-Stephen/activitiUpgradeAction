@@ -26,19 +26,17 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/build-context:/app \
             -w /app \
-            -u root \
-            ghcr.io/graalvm/native-image:ol8-java21 \
+            ghcr.io/graalvm/native-image-community:21 \
             bash -c "
-              ls -l /app && \  # 调试挂载
-              mkdir -p /app/{classes,output} && \
-              chmod -R 777 /app && \
-              javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
+              mkdir -p /app/classes /app/output &&
+              javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
               native-image \
                 -cp /app/classes:/app/jar/* \
-                -o /app/output/compatibility-tool \
-                com.redxun.util.CompatibilityProcessRepairTool
+                -H:Path=/app/output \
+                com.redxun.util.CompatibilityProcessRepairTool \
+                compatibility-tool
             "
-
+            
       - name: Verify on CentOS 7
         run: |
           docker run --rm \
