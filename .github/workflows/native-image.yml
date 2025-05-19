@@ -31,9 +31,9 @@ jobs:
             yum makecache &&
             yum install -y gcc glibc-devel zlib-devel wget unzip curl tar &&
 
-            curl -L -o graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.3.3/graalvm-ce-java21-linux-amd64-21.3.3.tar.gz &&
+            curl -L -o graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-24.0.1/graalvm-community-jdk-24.0.1_linux-x64_bin.tar.gz &&
             tar -xzf graalvm.tar.gz &&
-            export GRAALVM_HOME=$(pwd)/graalvm-ce-java21-21.3.3 &&
+            export GRAALVM_HOME=$(pwd)/graalvm-community-openjdk-24.0.1+9.1 &&
             export PATH=\$GRAALVM_HOME/bin:\$PATH &&
           
             # 验证 Java 与 native-image
