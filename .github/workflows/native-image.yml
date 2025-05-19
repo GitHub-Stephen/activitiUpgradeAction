@@ -24,7 +24,9 @@ jobs:
       - name: Compile and build native image
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}/build-context:/app \
+            -v ${{ github.workspace }}/build-context/src:/app/src \
+            -v ${{ github.workspace }}/build-context/jar:/app/jar \
+            -v ${{ github.workspace }}/build-context/output:/app/output \
             -w /app \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
