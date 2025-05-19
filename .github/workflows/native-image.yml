@@ -37,7 +37,6 @@ jobs:
             export PATH=\$GRAALVM_HOME/bin:\$PATH &&
           
             # 验证 Java 与 native-image
-            java -version &&
             native-image --version &&
 
             mkdir -p classes &&
