@@ -1,4 +1,4 @@
-name: Build Native Image
+name: Build Native Image (CentOS 7 in Docker)
 
 on:
   push:
@@ -6,37 +6,35 @@ on:
 
 jobs:
   build:
-    name: Build Native Image on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]  # 你也可以加入 macos-latest, windows-latest
+    name: Build Native Image in CentOS 7
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1
-        with:
-          version: '21.0.2'
-          java-version: '21'
-          distribution: 'graalvm-community'
-
-      - name: Compile Java Class
+      - name: Prepare build context
         run: |
-          mkdir -p classes
-          javac -d classes -cp "jar/*" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java
+          mkdir build-context
+          cp -r src jar build-context/
+          cp -r src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/
 
-      - name: Build Native Image
+      - name: Build Native Image in CentOS 7 Docker
         run: |
-          native-image \
-            -cp classes:jar/* \
-            com.redxun.util.CompatibilityProcessRepairTool \
-            compatibility-tool
+          docker run --rm -v ${{ github.workspace }}/build-context:/app -w /app centos:7 bash -c "
+            yum install -y gcc glibc-devel zlib-devel wget unzip &&
+            curl -L -O https://download.oracle.com/graalvm/21/latest/graalvm-community-jdk-21_linux-x64_bin.tar.gz &&
+            tar -xzf graalvm-community-jdk-21_linux-x64_bin.tar.gz &&
+            export GRAALVM_HOME=\$(pwd)/graalvm-community-* &&
+            export PATH=\$GRAALVM_HOME/bin:\$PATH &&
+            \$GRAALVM_HOME/bin/gu install native-image &&
+            mkdir -p classes &&
+            javac -d classes -cp \"jar/*\" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
+            native-image -cp classes:jar/* com.redxun.util.CompatibilityProcessRepairTool compatibility-tool
+          "
 
       - name: Archive binary
         uses: actions/upload-artifact@v4
         with:
-          name: compatibility-tool-${{ matrix.os }}
-          path: compatibility-tool
+          name: compatibility-tool-centos7
+          path: build-context/compatibility-tool
