@@ -29,7 +29,8 @@ jobs:
             -u root \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
-              mkdir -p /app/output
+              pwd && \         
+              ls -l   
               
             "
 
