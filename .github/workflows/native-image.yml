@@ -34,10 +34,9 @@ jobs:
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
               native-image \
                 -cp /app/classes:/app/jar/* \
-                -H:Path=/app/output \
-                com.redxun.util.CompatibilityProcessRepairTool \
-                /app/output/compatibility-tool
-            "
+                -o /app/output/compatibility-tool
+                com.redxun.util.CompatibilityProcessRepairTool
+          "
 
       - name: Verify on CentOS 7
         run: |
