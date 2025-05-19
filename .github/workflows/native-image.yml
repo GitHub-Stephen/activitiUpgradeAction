@@ -21,7 +21,7 @@ jobs:
           cp src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/src/main/java/com/redxun/util/
           cp -r jar/* build-context/jar/
 
-      - name: Compile and build native image using GraalVM JDK 21
+      - name: Compile and build native image
         run: |
           docker run --rm \
             -v ${{ github.workspace }}/build-context:/app \
@@ -29,7 +29,7 @@ jobs:
             -u root \
             ghcr.io/graalvm/native-image:ol8-java21 \
             bash -c "
-              ls -l /app && \
+              ls -l /app && \  # 调试挂载
               mkdir -p /app/{classes,output} && \
               chmod -R 777 /app && \
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
