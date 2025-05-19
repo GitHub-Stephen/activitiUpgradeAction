@@ -30,6 +30,7 @@ jobs:
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p /app/output && \
+              ls -l && \
               chmod 777 /app/output && \
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
               native-image \
