@@ -28,6 +28,7 @@ jobs:
             -v ${{ github.workspace }}/build-context/jar:/jar \
             -v ${{ github.workspace }}/build-context/output:/output \
             -w /app \
+            -u root \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p /app/classes &&
