@@ -17,6 +17,7 @@ jobs:
         run: |
           mkdir -p build-context/src/main/java/com/redxun/util
           mkdir -p build-context/jar
+          mkdir -p build-context/output
           cp src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/src/main/java/com/redxun/util/
           cp -r jar/* build-context/jar/
 
@@ -27,10 +28,11 @@ jobs:
             -w /app \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
-              mkdir -p classes &&
-              javac -d classes -cp 'jar/*' src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
+              mkdir -p /app/classes /app/output &&
+              javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
               native-image \
-                -cp classes:jar/* \
+                -cp /app/classes:/app/jar/* \
+                -H:Path=/app/output \
                 com.redxun.util.CompatibilityProcessRepairTool \
                 compatibility-tool
             "
@@ -39,7 +41,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}/build-context:/app \
-            -w /app \
+            -w /app/output \
             centos:7 \
             bash -c "./compatibility-tool --version && echo '✅ Runs on CentOS 7 successfully'"
 
@@ -47,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compatibility-tool-centos7
-          path: build-context/compatibility-tool
+          path: build-context/output/compatibility-tool
