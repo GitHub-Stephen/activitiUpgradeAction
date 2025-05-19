@@ -15,9 +15,10 @@ jobs:
 
       - name: Prepare build context
         run: |
-          mkdir -p build-context/src
-          cp -r src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/src/
-          cp -r jar build-context/
+          mkdir -p build-context/src/main/java/com/redxun/util
+          mkdir -p build-context/jar
+          cp src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java build-context/src/main/java/com/redxun/util/
+          cp -r jar/* build-context/jar/
 
       - name: Compile and build native image using GraalVM JDK 21
         run: |
@@ -27,7 +28,7 @@ jobs:
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p classes &&
-              javac -d classes -cp 'jar/*' src/CompatibilityProcessRepairTool.java &&
+              javac -d classes -cp 'jar/*' src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
               native-image \
                 -cp classes:jar/* \
                 com.redxun.util.CompatibilityProcessRepairTool \
