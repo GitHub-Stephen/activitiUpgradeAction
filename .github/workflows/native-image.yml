@@ -32,8 +32,8 @@ jobs:
             yum install -y gcc glibc-devel zlib-devel wget unzip curl tar &&
 
             # 下载 GraalVM
-            curl -L -O https://download.oracle.com/graalvm/21/latest/graalvm-community-jdk-21_linux-x64_bin.tar.gz &&
-            tar -xzf graalvm-community-jdk-21_linux-x64_bin.tar.gz &&
+            curl -L -o graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-21.0.2/graalvm-community-jdk-21.0.2_linux-x64.tar.gz &&
+            tar -xzf graalvm.tar.gz &&
 
             export GRAALVM_HOME=\$(pwd)/graalvm-community-* &&
             export PATH=\$GRAALVM_HOME/bin:\$PATH &&
