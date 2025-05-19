@@ -42,7 +42,7 @@ jobs:
             mkdir -p classes &&
             javac -d classes -cp \"jar/*\" src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
 
-            native-image -cp classes:jar/* com.redxun.util.CompatibilityProcessRepairTool compatibility-tool
+            native-image -cp classes:jar/* com.redxun.util.CompatibilityProcessRepairTool /app/compatibility-tool
           "
 
       - name: Archive binary
