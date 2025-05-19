@@ -35,8 +35,7 @@ jobs:
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
               native-image \
                 -cp /classes:/jar/* \
-                -H:Path=/output \
-                -H:Name=compatibility-tool \
+                -o /output/compatibility-tool \
                 com.redxun.util.CompatibilityProcessRepairTool
             "
             
