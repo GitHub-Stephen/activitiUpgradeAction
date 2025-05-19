@@ -34,9 +34,8 @@ jobs:
             # 下载 GraalVM
             curl -L -o graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-21.0.2/graalvm-community-jdk-21.0.2_linux-x64.tar.gz &&
             tar -xzf graalvm.tar.gz &&
-
-            export GRAALVM_HOME=\$(pwd)/graalvm-community-* &&
-            export PATH=\$GRAALVM_HOME/bin:\$PATH &&
+            export GRAALVM_HOME=$(pwd)/graalvm-community-jdk-21.0.2 &&
+            export PATH=$GRAALVM_HOME/bin:$PATH &&
 
             \$GRAALVM_HOME/bin/gu install native-image &&
 
