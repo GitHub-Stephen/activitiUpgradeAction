@@ -26,17 +26,17 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/build-context:/app \
             -w /app \
-            -u root \  # 以 root 用户运行，避免权限问题
+            -u root \
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p /app/output && \
-              chmod 777 /app/output && \  # 确保可写权限
+              chmod 777 /app/output && \
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
               native-image \
                 -cp /app/classes:/app/jar/* \
-                -H:Path=/app/output \  # 显式指定输出目录
+                -H:Path=/app/output \
                 com.redxun.util.CompatibilityProcessRepairTool \
-                /app/output/compatibility-tool  # 直接指定完整输出路径
+                /app/output/compatibility-tool
             "
 
       - name: Verify on CentOS 7
