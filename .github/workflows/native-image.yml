@@ -26,9 +26,11 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/build-context:/app \
             -w /app \
+            -u root \  # 添加这行以root用户运行
             ghcr.io/graalvm/native-image-community:21 \
             bash -c "
               mkdir -p /app/classes /app/output &&
+              chmod -R 777 /app &&  # 确保有足够权限
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java &&
               native-image \
                 -cp /app/classes:/app/jar/* \
