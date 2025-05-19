@@ -29,7 +29,7 @@ jobs:
             -u root \
             ghcr.io/graalvm/native-image:ol8-java21 \
             bash -c "
-              ls -l /app && \  
+              ls -l /app && \
               mkdir -p /app/{classes,output} && \
               chmod -R 777 /app && \
               javac -d /app/classes -cp '/app/jar/*' /app/src/main/java/com/redxun/util/CompatibilityProcessRepairTool.java && \
